@@ -16,6 +16,12 @@ import { Route as MarketingRouteImport } from './routes/_marketing'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as MarketingIndexRouteImport } from './routes/_marketing/index'
 import { Route as DashboardDashboardIndexRouteImport } from './routes/_dashboard/dashboard/index'
+import { Route as DashboardDashboardThreatsRouteImport } from './routes/_dashboard/dashboard/threats'
+import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard/settings'
+import { Route as DashboardDashboardProfileRouteImport } from './routes/_dashboard/dashboard/profile'
+import { Route as DashboardDashboardLogsRouteImport } from './routes/_dashboard/dashboard/logs'
+import { Route as DashboardDashboardIncidentsRouteImport } from './routes/_dashboard/dashboard/incidents'
+import { Route as DashboardDashboardAnalyticsRouteImport } from './routes/_dashboard/dashboard/analytics'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -50,12 +56,53 @@ const DashboardDashboardIndexRoute = DashboardDashboardIndexRouteImport.update({
   path: '/dashboard/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardDashboardThreatsRoute =
+  DashboardDashboardThreatsRouteImport.update({
+    id: '/dashboard/threats',
+    path: '/dashboard/threats',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardDashboardSettingsRoute =
+  DashboardDashboardSettingsRouteImport.update({
+    id: '/dashboard/settings',
+    path: '/dashboard/settings',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardDashboardProfileRoute =
+  DashboardDashboardProfileRouteImport.update({
+    id: '/dashboard/profile',
+    path: '/dashboard/profile',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardDashboardLogsRoute = DashboardDashboardLogsRouteImport.update({
+  id: '/dashboard/logs',
+  path: '/dashboard/logs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDashboardIncidentsRoute =
+  DashboardDashboardIncidentsRouteImport.update({
+    id: '/dashboard/incidents',
+    path: '/dashboard/incidents',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardDashboardAnalyticsRoute =
+  DashboardDashboardAnalyticsRouteImport.update({
+    id: '/dashboard/analytics',
+    path: '/dashboard/analytics',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof MarketingIndexRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/dashboard/incidents': typeof DashboardDashboardIncidentsRoute
+  '/dashboard/logs': typeof DashboardDashboardLogsRoute
+  '/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/dashboard/threats': typeof DashboardDashboardThreatsRoute
   '/dashboard/': typeof DashboardDashboardIndexRoute
 }
 export interface FileRoutesByTo {
@@ -63,6 +110,12 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/dashboard/incidents': typeof DashboardDashboardIncidentsRoute
+  '/dashboard/logs': typeof DashboardDashboardLogsRoute
+  '/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/dashboard/threats': typeof DashboardDashboardThreatsRoute
   '/dashboard': typeof DashboardDashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -73,13 +126,41 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/_marketing/': typeof MarketingIndexRoute
+  '/_dashboard/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/_dashboard/dashboard/incidents': typeof DashboardDashboardIncidentsRoute
+  '/_dashboard/dashboard/logs': typeof DashboardDashboardLogsRoute
+  '/_dashboard/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/_dashboard/dashboard/threats': typeof DashboardDashboardThreatsRoute
   '/_dashboard/dashboard/': typeof DashboardDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/forgot-password' | '/login' | '/register' | '/dashboard/'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/dashboard/analytics'
+    | '/dashboard/incidents'
+    | '/dashboard/logs'
+    | '/dashboard/profile'
+    | '/dashboard/settings'
+    | '/dashboard/threats'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/forgot-password' | '/login' | '/register' | '/dashboard'
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/dashboard/analytics'
+    | '/dashboard/incidents'
+    | '/dashboard/logs'
+    | '/dashboard/profile'
+    | '/dashboard/settings'
+    | '/dashboard/threats'
+    | '/dashboard'
   id:
     | '__root__'
     | '/_dashboard'
@@ -88,6 +169,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/_marketing/'
+    | '/_dashboard/dashboard/analytics'
+    | '/_dashboard/dashboard/incidents'
+    | '/_dashboard/dashboard/logs'
+    | '/_dashboard/dashboard/profile'
+    | '/_dashboard/dashboard/settings'
+    | '/_dashboard/dashboard/threats'
     | '/_dashboard/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -150,14 +237,68 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/_dashboard/dashboard/threats': {
+      id: '/_dashboard/dashboard/threats'
+      path: '/dashboard/threats'
+      fullPath: '/dashboard/threats'
+      preLoaderRoute: typeof DashboardDashboardThreatsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/settings': {
+      id: '/_dashboard/dashboard/settings'
+      path: '/dashboard/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardDashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/profile': {
+      id: '/_dashboard/dashboard/profile'
+      path: '/dashboard/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardDashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/logs': {
+      id: '/_dashboard/dashboard/logs'
+      path: '/dashboard/logs'
+      fullPath: '/dashboard/logs'
+      preLoaderRoute: typeof DashboardDashboardLogsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/incidents': {
+      id: '/_dashboard/dashboard/incidents'
+      path: '/dashboard/incidents'
+      fullPath: '/dashboard/incidents'
+      preLoaderRoute: typeof DashboardDashboardIncidentsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/analytics': {
+      id: '/_dashboard/dashboard/analytics'
+      path: '/dashboard/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof DashboardDashboardAnalyticsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
 interface DashboardRouteChildren {
+  DashboardDashboardAnalyticsRoute: typeof DashboardDashboardAnalyticsRoute
+  DashboardDashboardIncidentsRoute: typeof DashboardDashboardIncidentsRoute
+  DashboardDashboardLogsRoute: typeof DashboardDashboardLogsRoute
+  DashboardDashboardProfileRoute: typeof DashboardDashboardProfileRoute
+  DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
+  DashboardDashboardThreatsRoute: typeof DashboardDashboardThreatsRoute
   DashboardDashboardIndexRoute: typeof DashboardDashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardDashboardAnalyticsRoute: DashboardDashboardAnalyticsRoute,
+  DashboardDashboardIncidentsRoute: DashboardDashboardIncidentsRoute,
+  DashboardDashboardLogsRoute: DashboardDashboardLogsRoute,
+  DashboardDashboardProfileRoute: DashboardDashboardProfileRoute,
+  DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
+  DashboardDashboardThreatsRoute: DashboardDashboardThreatsRoute,
   DashboardDashboardIndexRoute: DashboardDashboardIndexRoute,
 }
 
