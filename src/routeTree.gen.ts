@@ -9,61 +9,322 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as MarketingRouteImport } from './routes/_marketing'
+import { Route as DashboardRouteImport } from './routes/_dashboard'
+import { Route as MarketingIndexRouteImport } from './routes/_marketing/index'
+import { Route as DashboardDashboardIndexRouteImport } from './routes/_dashboard/dashboard/index'
+import { Route as DashboardDashboardThreatsRouteImport } from './routes/_dashboard/dashboard/threats'
+import { Route as DashboardDashboardSettingsRouteImport } from './routes/_dashboard/dashboard/settings'
+import { Route as DashboardDashboardProfileRouteImport } from './routes/_dashboard/dashboard/profile'
+import { Route as DashboardDashboardLogsRouteImport } from './routes/_dashboard/dashboard/logs'
+import { Route as DashboardDashboardIncidentsRouteImport } from './routes/_dashboard/dashboard/incidents'
+import { Route as DashboardDashboardAnalyticsRouteImport } from './routes/_dashboard/dashboard/analytics'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketingRoute = MarketingRouteImport.update({
+  id: '/_marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/_dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketingIndexRoute = MarketingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => MarketingRoute,
+} as any)
+const DashboardDashboardIndexRoute = DashboardDashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDashboardThreatsRoute =
+  DashboardDashboardThreatsRouteImport.update({
+    id: '/dashboard/threats',
+    path: '/dashboard/threats',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardDashboardSettingsRoute =
+  DashboardDashboardSettingsRouteImport.update({
+    id: '/dashboard/settings',
+    path: '/dashboard/settings',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardDashboardProfileRoute =
+  DashboardDashboardProfileRouteImport.update({
+    id: '/dashboard/profile',
+    path: '/dashboard/profile',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardDashboardLogsRoute = DashboardDashboardLogsRouteImport.update({
+  id: '/dashboard/logs',
+  path: '/dashboard/logs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDashboardIncidentsRoute =
+  DashboardDashboardIncidentsRouteImport.update({
+    id: '/dashboard/incidents',
+    path: '/dashboard/incidents',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardDashboardAnalyticsRoute =
+  DashboardDashboardAnalyticsRouteImport.update({
+    id: '/dashboard/analytics',
+    path: '/dashboard/analytics',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof MarketingIndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/dashboard/incidents': typeof DashboardDashboardIncidentsRoute
+  '/dashboard/logs': typeof DashboardDashboardLogsRoute
+  '/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/dashboard/threats': typeof DashboardDashboardThreatsRoute
+  '/dashboard/': typeof DashboardDashboardIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/': typeof MarketingIndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/dashboard/incidents': typeof DashboardDashboardIncidentsRoute
+  '/dashboard/logs': typeof DashboardDashboardLogsRoute
+  '/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/dashboard/threats': typeof DashboardDashboardThreatsRoute
+  '/dashboard': typeof DashboardDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_dashboard': typeof DashboardRouteWithChildren
+  '/_marketing': typeof MarketingRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/_marketing/': typeof MarketingIndexRoute
+  '/_dashboard/dashboard/analytics': typeof DashboardDashboardAnalyticsRoute
+  '/_dashboard/dashboard/incidents': typeof DashboardDashboardIncidentsRoute
+  '/_dashboard/dashboard/logs': typeof DashboardDashboardLogsRoute
+  '/_dashboard/dashboard/profile': typeof DashboardDashboardProfileRoute
+  '/_dashboard/dashboard/settings': typeof DashboardDashboardSettingsRoute
+  '/_dashboard/dashboard/threats': typeof DashboardDashboardThreatsRoute
+  '/_dashboard/dashboard/': typeof DashboardDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/dashboard/analytics'
+    | '/dashboard/incidents'
+    | '/dashboard/logs'
+    | '/dashboard/profile'
+    | '/dashboard/settings'
+    | '/dashboard/threats'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/dashboard/analytics'
+    | '/dashboard/incidents'
+    | '/dashboard/logs'
+    | '/dashboard/profile'
+    | '/dashboard/settings'
+    | '/dashboard/threats'
+    | '/dashboard'
+  id:
+    | '__root__'
+    | '/_dashboard'
+    | '/_marketing'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/_marketing/'
+    | '/_dashboard/dashboard/analytics'
+    | '/_dashboard/dashboard/incidents'
+    | '/_dashboard/dashboard/logs'
+    | '/_dashboard/dashboard/profile'
+    | '/_dashboard/dashboard/settings'
+    | '/_dashboard/dashboard/threats'
+    | '/_dashboard/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  MarketingRoute: typeof MarketingRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_marketing': {
+      id: '/_marketing'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof MarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_dashboard': {
+      id: '/_dashboard'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_marketing/': {
+      id: '/_marketing/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof MarketingIndexRouteImport
+      parentRoute: typeof MarketingRoute
+    }
+    '/_dashboard/dashboard/': {
+      id: '/_dashboard/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardDashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/threats': {
+      id: '/_dashboard/dashboard/threats'
+      path: '/dashboard/threats'
+      fullPath: '/dashboard/threats'
+      preLoaderRoute: typeof DashboardDashboardThreatsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/settings': {
+      id: '/_dashboard/dashboard/settings'
+      path: '/dashboard/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardDashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/profile': {
+      id: '/_dashboard/dashboard/profile'
+      path: '/dashboard/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof DashboardDashboardProfileRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/logs': {
+      id: '/_dashboard/dashboard/logs'
+      path: '/dashboard/logs'
+      fullPath: '/dashboard/logs'
+      preLoaderRoute: typeof DashboardDashboardLogsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/incidents': {
+      id: '/_dashboard/dashboard/incidents'
+      path: '/dashboard/incidents'
+      fullPath: '/dashboard/incidents'
+      preLoaderRoute: typeof DashboardDashboardIncidentsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/_dashboard/dashboard/analytics': {
+      id: '/_dashboard/dashboard/analytics'
+      path: '/dashboard/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof DashboardDashboardAnalyticsRouteImport
+      parentRoute: typeof DashboardRoute
     }
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardDashboardAnalyticsRoute: typeof DashboardDashboardAnalyticsRoute
+  DashboardDashboardIncidentsRoute: typeof DashboardDashboardIncidentsRoute
+  DashboardDashboardLogsRoute: typeof DashboardDashboardLogsRoute
+  DashboardDashboardProfileRoute: typeof DashboardDashboardProfileRoute
+  DashboardDashboardSettingsRoute: typeof DashboardDashboardSettingsRoute
+  DashboardDashboardThreatsRoute: typeof DashboardDashboardThreatsRoute
+  DashboardDashboardIndexRoute: typeof DashboardDashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardDashboardAnalyticsRoute: DashboardDashboardAnalyticsRoute,
+  DashboardDashboardIncidentsRoute: DashboardDashboardIncidentsRoute,
+  DashboardDashboardLogsRoute: DashboardDashboardLogsRoute,
+  DashboardDashboardProfileRoute: DashboardDashboardProfileRoute,
+  DashboardDashboardSettingsRoute: DashboardDashboardSettingsRoute,
+  DashboardDashboardThreatsRoute: DashboardDashboardThreatsRoute,
+  DashboardDashboardIndexRoute: DashboardDashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
+interface MarketingRouteChildren {
+  MarketingIndexRoute: typeof MarketingIndexRoute
+}
+
+const MarketingRouteChildren: MarketingRouteChildren = {
+  MarketingIndexRoute: MarketingIndexRoute,
+}
+
+const MarketingRouteWithChildren = MarketingRoute._addFileChildren(
+  MarketingRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
+  MarketingRoute: MarketingRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
