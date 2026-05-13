@@ -15,7 +15,8 @@ export const Route = createFileRoute("/_dashboard")({
   },
 });
 
-const NAV = [
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
+const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { to: "/dashboard/threats", label: "Threat Feed", icon: ShieldAlert },
   { to: "/dashboard/incidents", label: "Incidents", icon: Siren },
@@ -23,7 +24,7 @@ const NAV = [
   { to: "/dashboard/logs", label: "System Logs", icon: TerminalIcon },
   { to: "/dashboard/profile", label: "Profile", icon: User },
   { to: "/dashboard/settings", label: "Settings", icon: SettingsIcon },
-] as const;
+];
 
 function DashboardLayout() {
   const [collapsed, setCollapsed] = useState(false);
