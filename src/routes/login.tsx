@@ -5,6 +5,8 @@ import { Logo } from "@/components/cyber/Logo";
 import { ParticleField } from "@/components/cyber/ParticleField";
 import { Mail, Lock, Loader2, Shield } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
+import { ApiError } from "@/lib/api";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -13,20 +15,27 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const nav = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (!email || !password) {
       toast.error("Please enter your email and password");
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      toast.success("Welcome back, Analyst");
+    try {
+      const u = await login(email, password);
+      toast.success(`Welcome back${u.name ? `, ${u.name}` : ""}`);
       nav({ to: "/dashboard" });
-    }, 900);
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Login failed";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
