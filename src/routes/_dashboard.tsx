@@ -86,7 +86,7 @@ function DashboardLayout() {
         </nav>
         <div className="absolute bottom-3 left-3 right-3">
           <button
-            onClick={() => { toast("Signed out"); nav({ to: "/" }); }}
+            onClick={() => { logout(); toast("Signed out"); nav({ to: "/login" }); }}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-sidebar-accent hover:text-danger transition"
           >
             <LogOut className="w-4 h-4" />
@@ -128,10 +128,12 @@ function DashboardLayout() {
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-danger glow-red" />
               </button>
               <div className="ml-2 flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyber to-chart-5 grid place-items-center text-xs font-semibold text-primary-foreground">AK</div>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyber to-chart-5 grid place-items-center text-xs font-semibold text-primary-foreground">
+                  {initials(user?.name || user?.username || user?.email || "?")}
+                </div>
                 <div className="hidden md:block leading-tight">
-                  <div className="text-xs font-medium">A. Kovacs</div>
-                  <div className="text-[10px] text-muted-foreground">Lead Analyst</div>
+                  <div className="text-xs font-medium">{user?.name || user?.username || "Analyst"}</div>
+                  <div className="text-[10px] text-muted-foreground">{user?.role || user?.email || ""}</div>
                 </div>
               </div>
             </div>
