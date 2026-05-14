@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, Link, useRouterState, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard, ShieldAlert, Siren, BarChart3, Terminal as TerminalIcon,
@@ -7,12 +7,11 @@ import {
 import { Logo } from "@/components/cyber/Logo";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
+import { getToken } from "@/lib/api";
 
 export const Route = createFileRoute("/_dashboard")({
   component: DashboardLayout,
-  beforeLoad: () => {
-    // Redirect bare "/dashboard" parent to overview if needed; but we use "/dashboard" as index.
-  },
 });
 
 type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean };
