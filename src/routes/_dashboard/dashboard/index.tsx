@@ -12,7 +12,9 @@ import { AnimatedCounter } from "@/components/cyber/AnimatedCounter";
 import { LiveTerminal } from "@/components/cyber/LiveTerminal";
 import { AttackMap } from "@/components/cyber/AttackMap";
 import { SeverityBadge } from "@/components/cyber/SeverityBadge";
-import { threats, attackTimeline, attackTypes, blockedByDay, trafficArea } from "@/lib/mock-data";
+import { threats as fallbackThreats, attackTimeline, attackTypes, blockedByDay, trafficArea, type Threat } from "@/lib/mock-data";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 export const Route = createFileRoute("/_dashboard/dashboard/")({
   component: DashboardOverview,
@@ -56,7 +58,19 @@ function StatCard({
 }
 
 function DashboardOverview() {
-  const recent = threats.slice(0, 6);
+  const { data: liveThreats } = useQuery({
+    queryKey: ["threats"],
+    queryFn: () => api<unknown>("/threats"),
+    select: (p): Threat[] => {
+      if (Array.isArray(p)) return p as Threat[];
+      if (p && typeof p === "object") {
+        const r = p as Record<string, unknown>;
+        for (const k of ["data", "threats", "items", "results"]) if (Array.isArray(r[k])) return r[k] as Threat[];
+      }
+      return [];
+    },
+  });
+  const recent = (liveThreats && liveThreats.length > 0 ? liveThreats : fallbackThreats).slice(0, 6);
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between">

@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Filter, Download } from "lucide-react";
-import { logSamples } from "@/lib/mock-data";
+import { Search, Filter, Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { ApiErrorState } from "./threats";
 
 export const Route = createFileRoute("/_dashboard/dashboard/logs")({
   component: LogsPage,
@@ -11,51 +13,83 @@ export const Route = createFileRoute("/_dashboard/dashboard/logs")({
 
 type Level = "ALL" | "ERROR" | "WARN" | "INFO" | "DEBUG";
 
-interface LogEntry { ts: string; level: string; msg: string; }
+interface LogEntry {
+  ts?: string;
+  timestamp?: string;
+  time?: string;
+  level: string;
+  msg?: string;
+  message?: string;
+}
+
+function normalizeList(payload: unknown): LogEntry[] {
+  if (Array.isArray(payload)) return payload as LogEntry[];
+  if (payload && typeof payload === "object") {
+    const p = payload as Record<string, unknown>;
+    for (const k of ["data", "logs", "items", "results"]) {
+      if (Array.isArray(p[k])) return p[k] as LogEntry[];
+    }
+  }
+  return [];
+}
+
+function tsOf(l: LogEntry) {
+  return l.ts || l.timestamp || l.time || new Date().toISOString();
+}
+function msgOf(l: LogEntry) {
+  return l.msg || l.message || "";
+}
 
 function LogsPage() {
-  const [logs, setLogs] = useState<LogEntry[]>(() =>
-    Array.from({ length: 30 }, (_, i) => {
-      const s = logSamples[Math.floor(Math.random() * logSamples.length)];
-      return { ts: new Date(Date.now() - (30 - i) * 4000).toISOString(), level: s.level, msg: s.msg };
-    }),
-  );
+  const { data, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["logs"],
+    queryFn: () => api<unknown>("/logs"),
+    select: normalizeList,
+    refetchInterval: 5000,
+  });
+
+  const logs: LogEntry[] = data ?? [];
   const [q, setQ] = useState("");
   const [level, setLevel] = useState<Level>("ALL");
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      const s = logSamples[Math.floor(Math.random() * logSamples.length)];
-      setLogs((l) => [...l.slice(-300), { ts: new Date().toISOString(), level: s.level, msg: s.msg }]);
-    }, 1500);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
     if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
   }, [logs]);
 
-  const filtered = useMemo(() =>
-    logs.filter((l) => (level === "ALL" || l.level === level) && (!q || l.msg.toLowerCase().includes(q.toLowerCase()))),
-  [logs, level, q]);
+  const filtered = useMemo(
+    () =>
+      logs.filter(
+        (l) =>
+          (level === "ALL" || (l.level || "").toUpperCase() === level) &&
+          (!q || msgOf(l).toLowerCase().includes(q.toLowerCase())),
+      ),
+    [logs, level, q],
+  );
 
   function exp() {
-    const blob = new Blob([filtered.map((l) => `${l.ts} [${l.level}] ${l.msg}`).join("\n")], { type: "text/plain" });
+    const blob = new Blob(
+      [filtered.map((l) => `${tsOf(l)} [${l.level}] ${msgOf(l)}`).join("\n")],
+      { type: "text/plain" },
+    );
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = "logs.txt"; a.click();
+    a.href = URL.createObjectURL(blob);
+    a.download = "logs.txt";
+    a.click();
     toast.success("Logs exported");
   }
 
-  const lvlColor = (l: string) =>
-    l === "ERROR" ? "text-danger" : l === "WARN" ? "text-warn" : l === "INFO" ? "text-cyber" : "text-muted-foreground";
+  const lvlColor = (l: string) => {
+    const u = (l || "").toUpperCase();
+    return u === "ERROR" ? "text-danger" : u === "WARN" ? "text-warn" : u === "INFO" ? "text-cyber" : "text-muted-foreground";
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-semibold">System Logs</h1>
-          <p className="text-sm text-muted-foreground mt-1">Real-time stream from all sensors</p>
+          <p className="text-sm text-muted-foreground mt-1">Real-time stream from all sensors · auto-refresh 5s</p>
         </div>
         <button onClick={exp} className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyber text-primary-foreground text-sm font-medium glow-cyan">
           <Download className="w-4 h-4" /> Export
@@ -83,15 +117,29 @@ function LogsPage() {
           <span className="w-2.5 h-2.5 rounded-full bg-success" />
           <span className="ml-3 text-xs text-muted-foreground font-mono">soc@cybershield: ~/logs · {filtered.length} lines</span>
         </div>
-        <div ref={ref} className="font-mono text-xs leading-relaxed h-[60vh] overflow-y-auto p-4 space-y-0.5">
-          {filtered.map((l, i) => (
-            <div key={i} className="whitespace-nowrap">
-              <span className="text-muted-foreground">{l.ts.slice(11, 19)}</span>{" "}
-              <span className={`${lvlColor(l.level)} font-semibold`}>[{l.level}]</span>{" "}
-              <span>{l.msg}</span>
-            </div>
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="py-16 grid place-items-center text-sm text-muted-foreground gap-2">
+            <Loader2 className="w-5 h-5 animate-spin text-cyber" /> Streaming logs…
+          </div>
+        ) : isError ? (
+          <ApiErrorState error={error} onRetry={() => refetch()} />
+        ) : (
+          <div ref={ref} className="font-mono text-xs leading-relaxed h-[60vh] overflow-y-auto p-4 space-y-0.5">
+            {filtered.map((l, i) => {
+              const t = tsOf(l);
+              return (
+                <div key={i} className="whitespace-nowrap">
+                  <span className="text-muted-foreground">{t.length >= 19 ? t.slice(11, 19) : t}</span>{" "}
+                  <span className={`${lvlColor(l.level)} font-semibold`}>[{(l.level || "INFO").toUpperCase()}]</span>{" "}
+                  <span>{msgOf(l)}</span>
+                </div>
+              );
+            })}
+            {filtered.length === 0 && (
+              <div className="text-center py-10 text-muted-foreground">No logs match your filters.</div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,8 @@ import { ParticleField } from "@/components/cyber/ParticleField";
 import { Mail, Lock, User, AtSign, Building2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "./login";
+import { useAuth } from "@/lib/auth";
+import { ApiError } from "@/lib/api";
 
 export const Route = createFileRoute("/register")({
   component: RegisterPage,
@@ -23,6 +25,7 @@ function strength(pw: string) {
 
 function RegisterPage() {
   const nav = useNavigate();
+  const { register } = useAuth();
   const [form, setForm] = useState({ name: "", username: "", email: "", password: "", confirm: "", org: "" });
   const [loading, setLoading] = useState(false);
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -30,16 +33,28 @@ function RegisterPage() {
   const labels = ["Too short", "Weak", "Okay", "Strong", "Excellent"];
   const colors = ["bg-muted", "bg-danger", "bg-warn", "bg-cyber", "bg-success"];
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (Object.values(form).some((v) => !v)) return toast.error("Fill all fields");
     if (form.password !== form.confirm) return toast.error("Passwords don't match");
     if (sc < 2) return toast.error("Password too weak");
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await register({
+        name: form.name,
+        username: form.username,
+        email: form.email,
+        password: form.password,
+        organization: form.org,
+      });
       toast.success("Account created — welcome to CyberShield");
       nav({ to: "/dashboard" });
-    }, 900);
+    } catch (err) {
+      const msg = err instanceof ApiError ? err.message : err instanceof Error ? err.message : "Registration failed";
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
