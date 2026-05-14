@@ -31,6 +31,14 @@ function DashboardLayout() {
   const [time, setTime] = useState(new Date());
   const path = useRouterState({ select: (s) => s.location.pathname });
   const nav = useNavigate();
+  const { user, logout } = useAuth();
+
+  // Client-side auth guard (loaders run on server during SSR with no token).
+  useEffect(() => {
+    if (typeof window !== "undefined" && !getToken()) {
+      nav({ to: "/login" });
+    }
+  }, [nav]);
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000);
