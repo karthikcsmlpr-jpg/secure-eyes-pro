@@ -29,16 +29,33 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 function pickUser(payload: unknown): AuthUser | null {
   if (!payload || typeof payload !== "object") return null;
   const p = payload as Record<string, unknown>;
+  // { user: {...} }
   if (p.user && typeof p.user === "object") return p.user as AuthUser;
-  if (p.data && typeof p.data === "object") return p.data as AuthUser;
+  // { data: { user: {...} } } or { data: {...userFields} }
+  if (p.data && typeof p.data === "object") {
+    const d = p.data as Record<string, unknown>;
+    if (d.user && typeof d.user === "object") return d.user as AuthUser;
+    // Heuristic: data is the user when it has email/id
+    if ("email" in d || "id" in d || "username" in d) {
+      // Strip token-like keys before returning as user
+      const { token, accessToken, access_token, jwt, authToken, ...rest } = d as Record<string, unknown>;
+      void token; void accessToken; void access_token; void jwt; void authToken;
+      return rest as AuthUser;
+    }
+  }
   return p as AuthUser;
 }
 function pickToken(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") return null;
   const p = payload as Record<string, unknown>;
-  for (const k of ["token", "accessToken", "access_token", "jwt", "authToken"]) {
-    const v = p[k];
-    if (typeof v === "string" && v) return v;
+  const sources: Record<string, unknown>[] = [p];
+  if (p.data && typeof p.data === "object") sources.push(p.data as Record<string, unknown>);
+  if (p.user && typeof p.user === "object") sources.push(p.user as Record<string, unknown>);
+  for (const src of sources) {
+    for (const k of ["token", "accessToken", "access_token", "jwt", "authToken"]) {
+      const v = src[k];
+      if (typeof v === "string" && v) return v;
+    }
   }
   return null;
 }
@@ -92,13 +109,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (payload: Record<string, unknown>) => {
     const data = await api<unknown>("/auth/register", { method: "POST", body: payload, auth: false });
-    const tok = pickToken(data);
-    if (tok) {
-      setToken(tok);
-      setTokState(tok);
-    }
+    let tok = pickToken(data);
     let u = pickUser(data);
-    if (tok && (!u || !u.email)) {
+    // Backend doesn't return a token on register — auto-login to obtain one
+    if (!tok && payload.email && payload.password) {
+      const loginResp = await api<unknown>("/auth/login", {
+        method: "POST",
+        body: { email: payload.email, password: payload.password },
+        auth: false,
+      });
+      tok = pickToken(loginResp);
+      u = pickUser(loginResp) ?? u;
+    }
+    if (!tok) throw new Error("Registration succeeded but no token was returned");
+    setToken(tok);
+    setTokState(tok);
+    if (!u || !u.email) {
       const profile = await api<unknown>("/auth/profile");
       u = pickUser(profile);
     }
