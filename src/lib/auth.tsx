@@ -109,13 +109,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (payload: Record<string, unknown>) => {
     const data = await api<unknown>("/auth/register", { method: "POST", body: payload, auth: false });
-    const tok = pickToken(data);
-    if (tok) {
-      setToken(tok);
-      setTokState(tok);
-    }
+    let tok = pickToken(data);
     let u = pickUser(data);
-    if (tok && (!u || !u.email)) {
+    // Backend doesn't return a token on register — auto-login to obtain one
+    if (!tok && payload.email && payload.password) {
+      const loginResp = await api<unknown>("/auth/login", {
+        method: "POST",
+        body: { email: payload.email, password: payload.password },
+        auth: false,
+      });
+      tok = pickToken(loginResp);
+      u = pickUser(loginResp) ?? u;
+    }
+    if (!tok) throw new Error("Registration succeeded but no token was returned");
+    setToken(tok);
+    setTokState(tok);
+    if (!u || !u.email) {
       const profile = await api<unknown>("/auth/profile");
       u = pickUser(profile);
     }
