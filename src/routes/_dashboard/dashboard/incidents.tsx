@@ -74,6 +74,7 @@ function IncidentsPage() {
       </div>
 
       <CreateIncidentForm />
+      <IncidentsTable list={list} isLoading={isLoading} />
 
 
       {isLoading ? (
