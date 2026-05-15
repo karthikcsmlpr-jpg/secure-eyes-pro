@@ -73,6 +73,9 @@ function IncidentsPage() {
         <p className="text-sm text-muted-foreground mt-1">Track, assign, and resolve security incidents</p>
       </div>
 
+      <CreateIncidentForm />
+
+
       {isLoading ? (
         <div className="glass rounded-xl py-16 grid place-items-center text-sm text-muted-foreground gap-2">
           <Loader2 className="w-5 h-5 animate-spin text-cyber" /> Loading incidents…
