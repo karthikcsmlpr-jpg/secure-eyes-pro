@@ -187,3 +187,128 @@ function Meta({ label, children }: { label: string; children: React.ReactNode })
     </div>
   );
 }
+
+const SEVERITIES: Severity[] = ["Critical", "High", "Medium", "Low"];
+const STATUSES: Incident["status"][] = ["Open", "In Progress", "Resolved"];
+
+function CreateIncidentForm() {
+  const qc = useQueryClient();
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState<Severity>("High");
+  const [status, setStatus] = useState<Incident["status"]>("Open");
+
+  const createMut = useMutation({
+    mutationFn: (payload: Partial<Incident>) =>
+      api<Incident>("/incidents", { method: "POST", body: payload }),
+    onSuccess: () => {
+      toast.success("Incident created");
+      setTitle(""); setDescription(""); setPriority("High"); setStatus("Open");
+      qc.invalidateQueries({ queryKey: ["incidents"] });
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Failed to create incident"),
+  });
+
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim()) return toast.error("Title is required");
+    createMut.mutate({
+      title: title.trim(),
+      description: description.trim(),
+      priority,
+      status,
+      opened: new Date().toISOString(),
+    });
+  }
+
+  const fieldCls = "w-full px-3 py-2 rounded-md bg-input border border-border/60 outline-none text-sm focus:border-cyber focus:ring-2 focus:ring-cyber/30";
+
+  return (
+    <form onSubmit={onSubmit} className="glass rounded-xl p-5 space-y-4">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-lg bg-cyber/10 text-cyber grid place-items-center border border-cyber/30">
+          <Plus className="w-4 h-4" />
+        </div>
+        <h2 className="text-base font-semibold">Create Incident</h2>
+      </div>
+      <div className="grid md:grid-cols-2 gap-3">
+        <div className="md:col-span-2">
+          <label className="text-xs uppercase tracking-wider text-muted-foreground">Title</label>
+          <input className={fieldCls + " mt-1"} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Suspicious lateral movement…" />
+        </div>
+        <div className="md:col-span-2">
+          <label className="text-xs uppercase tracking-wider text-muted-foreground">Description</label>
+          <textarea className={fieldCls + " mt-1 min-h-[88px]"} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What happened, affected systems, indicators…" />
+        </div>
+        <div>
+          <label className="text-xs uppercase tracking-wider text-muted-foreground">Severity</label>
+          <select className={fieldCls + " mt-1"} value={priority} onChange={(e) => setPriority(e.target.value as Severity)}>
+            {SEVERITIES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs uppercase tracking-wider text-muted-foreground">Status</label>
+          <select className={fieldCls + " mt-1"} value={status} onChange={(e) => setStatus(e.target.value as Incident["status"])}>
+            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={createMut.isPending}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-cyber text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
+        >
+          {createMut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          Create Incident
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function IncidentsTable({ list, isLoading }: { list: Incident[]; isLoading: boolean }) {
+  const statusColor = (s: Incident["status"]) =>
+    s === "Open" ? "bg-danger/15 text-danger border-danger/40" :
+    s === "In Progress" ? "bg-warn/15 text-warn border-warn/40" :
+    "bg-success/15 text-success border-success/40";
+
+  return (
+    <div className="glass rounded-xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-border/40 flex items-center justify-between">
+        <h2 className="text-base font-semibold">All Incidents</h2>
+        <span className="text-xs text-muted-foreground">{list.length} total</span>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead className="text-xs uppercase tracking-wider text-muted-foreground bg-background/30">
+            <tr>
+              <th className="text-left px-4 py-2 font-medium">ID</th>
+              <th className="text-left px-4 py-2 font-medium">Title</th>
+              <th className="text-left px-4 py-2 font-medium">Severity</th>
+              <th className="text-left px-4 py-2 font-medium">Status</th>
+              <th className="text-left px-4 py-2 font-medium">Assignee</th>
+              <th className="text-left px-4 py-2 font-medium">Opened</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground"><Loader2 className="w-4 h-4 animate-spin inline mr-2" />Loading…</td></tr>
+            ) : list.length === 0 ? (
+              <tr><td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">No incidents yet.</td></tr>
+            ) : list.map((inc) => (
+              <tr key={inc.id} className="border-t border-border/40 hover:bg-background/30">
+                <td className="px-4 py-2 font-mono text-xs text-cyber">{inc.id}</td>
+                <td className="px-4 py-2">{inc.title}</td>
+                <td className="px-4 py-2">{inc.priority && <SeverityBadge severity={inc.priority} />}</td>
+                <td className="px-4 py-2"><span className={`px-2 py-0.5 rounded-full border text-xs ${statusColor(inc.status)}`}>{inc.status}</span></td>
+                <td className="px-4 py-2 text-muted-foreground">{inc.assignee || "—"}</td>
+                <td className="px-4 py-2 text-muted-foreground text-xs">{inc.opened ? new Date(inc.opened).toLocaleString() : "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
