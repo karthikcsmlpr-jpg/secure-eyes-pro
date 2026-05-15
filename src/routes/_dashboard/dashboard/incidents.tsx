@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Siren, Clock, User as UserIcon, CheckCircle2, FileText, Loader2 } from "lucide-react";
+import { Siren, Clock, User as UserIcon, CheckCircle2, FileText, Loader2, Plus } from "lucide-react";
 import { SeverityBadge } from "@/components/cyber/SeverityBadge";
-import type { Incident } from "@/lib/mock-data";
+import type { Incident, Severity } from "@/lib/mock-data";
 import { toast } from "sonner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiError } from "@/lib/api";
