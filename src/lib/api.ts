@@ -2,7 +2,7 @@
 // Base URL can be overridden with VITE_API_URL.
 export const API_BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") ||
-  "https://dc1cf57e-1f5b-4f6e-b04a-54efb94531d2-00-yco6bpwtjaf6.sisko.replit.dev/api";
+  "https://threat-sentinel--Chandrashekh207.replit.app/api";
 
 const TOKEN_KEY = "cybershield.token";
 const USER_KEY = "cybershield.user";
