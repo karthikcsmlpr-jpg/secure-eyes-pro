@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const register = useCallback(async (payload: Record<string, unknown>) => {
-    const data = await api<unknown>("/auth/register", { method: "POST", body: payload, auth: false });
+    const data = await api<unknown>("/auth/signup", { method: "POST", body: payload, auth: false });
     let tok = pickToken(data);
     let u = pickUser(data);
     // Backend doesn't return a token on register — auto-login to obtain one
